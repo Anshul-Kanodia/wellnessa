@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: wellnessa-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        value: https://your-domain.com
+      - key: BCRYPT_ROUNDS
+        value: 12
+    healthCheckPath: /api/health

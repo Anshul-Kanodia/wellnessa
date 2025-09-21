@@ -1,0 +1,71 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production builds
+client/build/
+build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows batch files (keeping only essential ones)
+admin-fix.bat
+debug-start.bat
+fix-npm.bat
+install-npm-manually.bat
+powershell-fix.bat
+quick-fix.bat
+run-without-npm.bat
+simple-start-fixed.bat
+simple-start-no-bcrypt.bat
+simple-start.bat
+start-app.bat
+start-dev.bat
+user-scope-fix.bat
+client/start-client.bat
+
+# Temporary files
+*.tmp
+*.temp
+
+# Package manager files
+package-lock.json.bak
+yarn.lock.bak

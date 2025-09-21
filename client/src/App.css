@@ -1,0 +1,33 @@
+.App {
+  min-height: 100vh;
+}
+
+/* Curved section dividers */
+.curve-divider {
+  position: relative;
+  overflow: hidden;
+}
+
+.curve-divider::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: var(--primary-color);
+  border-radius: 0 0 50% 50%;
+  transform: scaleX(1.5);
+}
+
+.curve-divider-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: var(--primary-color);
+  border-radius: 50% 50% 0 0;
+  transform: scaleX(1.5);
+}

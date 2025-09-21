@@ -1,0 +1,330 @@
+/* Hero Section */
+.hero {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 70%, #4A9B8E 70%, #4A9B8E 100%);
+  padding: 80px 0 120px;
+  text-align: center;
+}
+
+.hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.hero-title {
+  font-size: 64px;
+  font-weight: 600;
+  color: #4A9B8E;
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+}
+
+.hero-subtitle {
+  font-size: 18px;
+  color: #666666;
+  margin-bottom: 60px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Accreditations Section */
+.accreditations {
+  background-color: #4A9B8E;
+  padding: 80px 0;
+}
+
+.section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section-title {
+  font-size: 48px;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.accreditation-badges {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-1 { background: linear-gradient(135deg, #FF6B6B, #FF8E8E); }
+.badge-2 { background: linear-gradient(135deg, #4ECDC4, #6ED5CC); }
+.badge-3 { background: linear-gradient(135deg, #45B7D1, #67C3D9); }
+.badge-4 { background: linear-gradient(135deg, #96CEB4, #B4D6C1); }
+.badge-5 { background: linear-gradient(135deg, #FFEAA7, #FFED4E); }
+
+.badge::before {
+  content: '';
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  position: absolute;
+}
+
+/* Our Product Section */
+.our-product {
+  background-color: #ffffff;
+  padding: 100px 0;
+}
+
+.product-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.product-text h2 {
+  font-size: 48px;
+  font-weight: 600;
+  color: #4A9B8E;
+  margin-bottom: 32px;
+  line-height: 1.2;
+}
+
+.product-description {
+  font-size: 16px;
+  color: #666666;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.product-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.device-mockup {
+  width: 400px;
+  height: 280px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.screens {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.screen {
+  width: 120px;
+  height: 80px;
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
+  border-radius: 8px;
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(74, 155, 142, 0.3);
+}
+
+/* How It Works Section */
+.how-it-works {
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 10%, #4A9B8E 10%, #4A9B8E 90%, #ffffff 90%, #ffffff 100%);
+  padding: 100px 0;
+}
+
+.how-it-works .section-title {
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.section-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.steps {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  background-color: #ffffff;
+  color: #4A9B8E;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.step-content h3 {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.step-content p {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+/* Testimonials Section */
+.testimonials {
+  background-color: #ffffff;
+  padding: 100px 0;
+}
+
+.testimonials .section-title {
+  color: #4A9B8E;
+  margin-bottom: 60px;
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  border: 1px solid #f0f0f0;
+}
+
+.testimonial-avatar {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="35" r="15" fill="white" opacity="0.8"/><path d="M20 80 Q50 60 80 80" fill="white" opacity="0.8"/></svg>');
+  background-size: 60%;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.testimonial-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4px;
+}
+
+.testimonial-role {
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 16px;
+}
+
+.testimonial-text {
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+/* Footer */
+.footer {
+  background-color: #4A9B8E;
+  padding: 60px 0 40px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.footer-link:hover {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 48px;
+  }
+  
+  .section-title {
+    font-size: 36px;
+  }
+  
+  .product-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .accreditation-badges {
+    gap: 24px;
+  }
+  
+  .badge {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 32px;
+    text-align: center;
+  }
+}
