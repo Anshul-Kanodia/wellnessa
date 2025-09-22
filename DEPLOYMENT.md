@@ -20,7 +20,7 @@ git add .
 git commit -m "Initial Wellnessa deployment"
 
 # Create repository on GitHub and push
-git remote add origin https://github.com/yourusername/wellnessa.git
+git remote add origin https://github.com/Anshul-Kanodia/wellnessa.git
 git branch -M main
 git push -u origin main
 ```
