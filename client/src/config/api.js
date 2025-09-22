@@ -4,7 +4,7 @@ const config = {
     API_BASE_URL: 'http://localhost:5001'
   },
   production: {
-    API_BASE_URL: process.env.REACT_APP_API_URL || 'https://your-backend-url.railway.app'
+    API_BASE_URL: process.env.REACT_APP_API_URL || 'https://wellnessa-backend.onrender.com'
   }
 };
 

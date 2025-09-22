@@ -1,32 +1,18 @@
 {
   "version": 2,
-  "name": "wellnessa-frontend",
-  "builds": [
+  "name": "wellnessa",
+  "buildCommand": "cd client && npm run build",
+  "outputDirectory": "client/build",
+  "installCommand": "cd client && npm install",
+  "framework": "create-react-app",
+  "rewrites": [
     {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "source": "/api/(.*)",
+      "destination": "https://wellnessa-backend.onrender.com/api/$1"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "https://wellnessa-yrr1.onrender.com/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ],
-  "functions": {
-    "client/build/**": {
-      "includeFiles": "client/build/**"
-    }
-  }
+  ]
 }
