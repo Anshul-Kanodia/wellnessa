@@ -17,7 +17,7 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "https://wellnessa-backend.onrender.com/api/$1"
+      "dest": "https://wellnessa-yrr1.onrender.com/api/$1"
     },
     {
       "src": "/(.*)",
