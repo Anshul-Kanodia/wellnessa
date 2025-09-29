@@ -4,25 +4,46 @@
   "description": "Wellnessa Healthcare Platform - React/Node.js Assessment System",
   "main": "server/index.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd server && node index.js",
-    "client": "cd client && npm start",
-    "build": "cd client && npm run build",
-    "start": "node server/index.js",
-    "install-all": "npm install && cd client && npm install"
-  },
+  "start": "node server/index.js",
+  "dev": "concurrently \"npm run server\" \"npm run client\"",
+  "server": "cd server && node index.js",
+  "server:db": "cd server && node index-with-db.js",
+  "client": "cd client && npm start",
+  "build": "cd client && npm run build",
+  "install-all": "npm install && cd client && npm install",
+  "db:generate": "npx prisma generate",
+  "db:push": "npx prisma db push",
+  "db:migrate": "npx prisma migrate dev",
+  "db:seed": "npx prisma db seed",
+  "db:studio": "npx prisma studio",
+  "db:reset": "npx prisma migrate reset",
+  "postinstall": "npx prisma generate"
+},
+"prisma": {
+  "seed": "node prisma/seed.js"
+},
   "dependencies": {
-    "express": "^4.18.2",
+    "@prisma/client": "^6.16.2",
+    "bcryptjs": "^2.4.3",
+    "concurrently": "^8.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^2.4.3",
-    "concurrently": "^8.2.2"
+    "pg": "^8.16.3",
+    "prisma": "^6.16.2"
   },
   "devDependencies": {
+    "@types/pg": "^8.15.5",
     "nodemon": "^3.0.1"
   },
-  "keywords": ["healthcare", "assessment", "react", "nodejs", "wellnessa"],
+  "keywords": [
+    "healthcare",
+    "assessment",
+    "react",
+    "nodejs",
+    "wellnessa"
+  ],
   "author": "Wellnessa Team",
   "license": "MIT"
 }
