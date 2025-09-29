@@ -1,4 +1,4 @@
-/* Admin Dashboard Styles - Enhanced */
+/* Admin Dashboard Styles - Enhanced with Green Theme */
 .admin-dashboard {
   padding: 20px;
   max-width: 1400px;
@@ -9,12 +9,12 @@
 }
 
 .dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
   color: white;
   padding: 40px;
   border-radius: 16px;
   margin-bottom: 30px;
-  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 40px rgba(74, 155, 142, 0.3);
 }
 
 .dashboard-header h1 {
@@ -59,15 +59,15 @@
 }
 
 .tab-btn:hover {
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.08);
+  color: #4A9B8E;
+  background: rgba(74, 155, 142, 0.08);
   transform: translateY(-1px);
 }
 
 .tab-btn.active {
   color: white;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
+  box-shadow: 0 4px 15px rgba(74, 155, 142, 0.4);
   transform: translateY(-2px);
 }
 
@@ -89,7 +89,7 @@
 
 /* Enhanced Primary Button */
 .add-user-btn, .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
   color: white;
   border: none;
   padding: 14px 28px;
@@ -98,7 +98,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(74, 155, 142, 0.3);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -106,7 +106,7 @@
 
 .add-user-btn:hover, .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(74, 155, 142, 0.4);
 }
 
 /* Enhanced Stats Grid */
@@ -134,18 +134,19 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
 }
 
 .stat-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  border-color: #4A9B8E;
 }
 
 .stat-value {
   font-size: 3rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 8px;
@@ -169,7 +170,7 @@
 }
 
 .table-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
   color: white;
   font-weight: 700;
   text-transform: uppercase;
@@ -177,7 +178,7 @@
 }
 
 .table-row:hover {
-  background: rgba(102, 126, 234, 0.04);
+  background: rgba(74, 155, 142, 0.04);
 }
 
 /* Enhanced Access Badges */
@@ -224,9 +225,19 @@
 }
 
 .modal input:focus, .modal select:focus {
-  border-color: #667eea;
+  border-color: #4A9B8E;
   background: white;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 4px rgba(74, 155, 142, 0.1);
+}
+
+.modal-actions button[type="submit"] {
+  background: linear-gradient(135deg, #4A9B8E, #6BB6A8);
+  color: white;
+}
+
+.modal-actions button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(74, 155, 142, 0.4);
 }
 
 /* Responsive Design */
