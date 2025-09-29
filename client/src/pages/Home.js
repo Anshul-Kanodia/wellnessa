@@ -89,7 +89,7 @@ const Home = () => {
             {[1, 2, 3].map((item) => (
               <div key={item} className="testimonial-card">
                 <div className="testimonial-avatar"></div>
-                <h4 className="testimonial-name">Anshul Kanojia</h4>
+                <h4 className="testimonial-name">Anshul Kanodia</h4>
                 <p className="testimonial-role">CEO and Founder</p>
                 <p className="testimonial-text">
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
