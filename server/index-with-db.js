@@ -353,6 +353,122 @@ app.get('/api/content/home', async (req, res) => {
   }
 });
 
+// Question Management API Endpoints (Super Admin only)
+
+// Get all questions with assessment details
+app.get('/api/admin/questions', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const questions = await prisma.assessmentQuestion.findMany({
+      include: {
+        subgroup: {
+          include: {
+            group: {
+              include: {
+                assessment: true
+              }
+            }
+          }
+        },
+        options: true
+      }
+    });
+
+    const formattedQuestions = questions.map(question => ({
+      id: question.id,
+      question: question.question,
+      assessmentId: question.subgroup.group.assessmentId,
+      assessmentTitle: question.subgroup.group.assessment.title,
+      groupName: question.subgroup.group.name,
+      subgroupName: question.subgroup.name,
+      options: question.options
+    }));
+
+    res.json(formattedQuestions);
+  } catch (error) {
+    console.error('Error fetching questions:', error);
+    res.status(500).json({ error: 'Failed to fetch questions' });
+  }
+});
+
+// Get all assessments
+app.get('/api/admin/assessments', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const assessments = await prisma.assessment.findMany({
+      include: {
+        groups: {
+          include: {
+            subgroups: true
+          }
+        }
+      }
+    });
+    res.json(assessments);
+  } catch (error) {
+    console.error('Error fetching assessments:', error);
+    res.status(500).json({ error: 'Failed to fetch assessments' });
+  }
+});
+
+// Add new question
+app.post('/api/admin/questions', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const { question, assessmentId, groupId, subgroupId, options } = req.body;
+
+    if (!question || !subgroupId || !options) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const result = await prisma.$transaction(async (prisma) => {
+      const newQuestion = await prisma.assessmentQuestion.create({
+        data: {
+          question,
+          subgroupId: parseInt(subgroupId)
+        }
+      });
+
+      const questionOptions = await Promise.all(
+        options.map((option, index) =>
+          prisma.questionOption.create({
+            data: {
+              questionId: newQuestion.id,
+              optionKey: String.fromCharCode(97 + index),
+              text: option.text,
+              score: parseInt(option.score)
+            }
+          })
+        )
+      );
+
+      return { ...newQuestion, options: questionOptions };
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error creating question:', error);
+    res.status(500).json({ error: 'Failed to create question' });
+  }
+});
+
+// Delete question
+app.delete('/api/admin/questions/:id', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const questionId = parseInt(req.params.id);
+
+    await prisma.assessmentQuestion.delete({
+      where: { id: questionId }
+    });
+
+    res.json({ message: 'Question deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting question:', error);
+    if (error.code === 'P2025') {
+      res.status(404).json({ error: 'Question not found' });
+    } else {
+      res.status(500).json({ error: 'Failed to delete question' });
+    }
+  }
+});
+
 // Serve React app
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));

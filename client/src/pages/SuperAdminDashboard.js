@@ -10,8 +10,10 @@ const SuperAdminDashboard = () => {
   const [results, setResults] = useState([]);
   const [content, setContent] = useState([]);
   const [questionnaire, setQuestionnaire] = useState([]);
+  const [questions, setQuestions] = useState([]);
   const [showAddUser, setShowAddUser] = useState(false);
   const [showEditContent, setShowEditContent] = useState(false);
+  const [showAddQuestion, setShowAddQuestion] = useState(false);
   const [showEditQuestionnaire, setShowEditQuestionnaire] = useState(false);
   const [selectedContent, setSelectedContent] = useState(null);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
@@ -33,10 +35,13 @@ const SuperAdminDashboard = () => {
 
   const [newQuestion, setNewQuestion] = useState({
     question: '',
-    options: ['', '', '', ''],
-    correctAnswer: 0,
-    category: '',
-    difficulty: 'medium'
+    subgroupId: '',
+    options: [
+      { text: '', score: 0 },
+      { text: '', score: 0 },
+      { text: '', score: 0 },
+      { text: '', score: 0 }
+    ]
   });
 
   useEffect(() => {
@@ -47,14 +52,16 @@ const SuperAdminDashboard = () => {
     try {
       const headers = getAuthHeaders();
       
-      const [usersRes, assessmentsRes, resultsRes, contentRes, questionnaireRes] = await Promise.all([
+      const [usersRes, assessmentsRes, resultsRes, contentRes, questionnaireRes, questionsRes] = await Promise.all([
         fetch('/api/admin/users', { headers }),
         fetch('/api/assessments', { headers }),
         fetch('/api/admin/results', { headers }),
         fetch('/api/content', { headers }),
-        fetch('/api/questionnaire', { headers })
+        fetch('/api/questionnaire', { headers }),
+        fetch('/api/admin/questions', { headers })
       ]);
 
+      if (questionsRes.ok) setQuestions(await questionsRes.json());
       if (usersRes.ok) setUsers(await usersRes.json());
       if (assessmentsRes.ok) setAssessments(await assessmentsRes.json());
       if (resultsRes.ok) setResults(await resultsRes.json());
@@ -100,6 +107,44 @@ const SuperAdminDashboard = () => {
         }
       } catch (error) {
         console.error('Error deleting user:', error);
+      }
+    }
+  };
+
+  const handleAddQuestion = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/admin/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify(newQuestion)
+      });
+      if (response.ok) {
+        setShowAddQuestion(false);
+        setNewQuestion({
+          question: '', subgroupId: '',
+          options: [{ text: '', score: 0 }, { text: '', score: 0 }, { text: '', score: 0 }, { text: '', score: 0 }]
+        });
+        fetchData();
+        alert('Question added successfully!');
+      }
+    } catch (error) {
+      console.error('Error adding question:', error);
+    }
+  };
+  
+  const handleDeleteQuestion = async (questionId) => {
+    if (window.confirm('Are you sure you want to delete this question?')) {
+      try {
+        const response = await fetch(`/api/admin/questions/${questionId}`, {
+          method: 'DELETE', headers: getAuthHeaders()
+        });
+        if (response.ok) {
+          setQuestions(prev => prev.filter(q => q.id !== questionId));
+          alert('Question deleted successfully!');
+        }
+      } catch (error) {
+        console.error('Error deleting question:', error);
       }
     }
   };
@@ -279,42 +324,30 @@ const SuperAdminDashboard = () => {
     <div className="questionnaire-management">
       <div className="section-header">
         <h3>Questionnaire Management</h3>
-        <button className="btn-primary" onClick={() => {
-          setSelectedQuestion(null);
-          setNewQuestion({ question: '', options: ['', '', '', ''], correctAnswer: 0, category: '', difficulty: 'medium' });
-          setShowEditQuestionnaire(true);
-        }}>
+        <button className="btn-primary" onClick={() => setShowAddQuestion(true)}>
           Add New Question
         </button>
       </div>
-      
-      <div className="questions-list">
-        {questionnaire.map((q, index) => (
-          <div key={q.id || index} className="question-card">
-            <h4>{q.question}</h4>
-            <div className="options">
-              {q.options?.map((option, i) => (
-                <div key={i} className={`option ${i === q.correctAnswer ? 'correct' : ''}`}>
-                  {option}
-                </div>
-              ))}
-            </div>
-            <div className="question-meta">
-              <span className="category">{q.category}</span>
-              <span className="difficulty">{q.difficulty}</span>
-              <button 
-                className="btn-secondary btn-small"
-                onClick={() => {
-                  setSelectedQuestion(q);
-                  setNewQuestion(q);
-                  setShowEditQuestionnaire(true);
-                }}
-              >
-                Edit
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="users-table">
+        <table>
+          <thead>
+            <tr><th>Question</th><th>Assessment</th><th>Group</th><th>Subgroup</th><th>Options</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            {questions.length > 0 ? questions.map(question => (
+              <tr key={question.id}>
+                <td style={{maxWidth: '300px', wordWrap: 'break-word'}}>{question.question}</td>
+                <td>{question.assessmentTitle}</td>
+                <td>{question.groupName}</td>
+                <td>{question.subgroupName}</td>
+                <td>{question.options?.length || 0} options</td>
+                <td><button className="btn-danger btn-small" onClick={() => handleDeleteQuestion(question.id)}>Delete</button></td>
+              </tr>
+            )) : (
+              <tr><td colSpan="6" style={{textAlign: 'center', padding: '20px', color: '#64748b'}}>No questions found. Add your first question to get started.</td></tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -449,6 +482,88 @@ const SuperAdminDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Add Question Modal */}
+{showAddQuestion && (
+  <div className="modal-overlay">
+    <div className="modal">
+      <h3>Add New Question</h3>
+      <form onSubmit={handleAddQuestion}>
+        <div className="form-group">
+          <label>Question Text</label>
+          <textarea
+            value={newQuestion.question}
+            onChange={(e) => setNewQuestion({...newQuestion, question: e.target.value})}
+            required
+            rows="3"
+            placeholder="Enter your question here..."
+          />
+        </div>
+        
+        <div className="form-group">
+          <label>Select Category</label>
+          <select
+            value={newQuestion.subgroupId}
+            onChange={(e) => setNewQuestion({...newQuestion, subgroupId: e.target.value})}
+            required
+          >
+            <option value="">Select Category</option>
+            {assessments.flatMap(assessment =>
+              assessment.groups.flatMap(group =>
+                group.subgroups.map(subgroup => (
+                  <option key={subgroup.id} value={subgroup.id}>
+                    {assessment.title} - {group.name} - {subgroup.name}
+                  </option>
+                ))
+              )
+            )}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Answer Options</label>
+          {newQuestion.options.map((option, index) => (
+            <div key={index} style={{display: 'flex', gap: '10px', marginBottom: '10px'}}>
+              <input
+                type="text"
+                placeholder={`Option ${index + 1}`}
+                value={option.text}
+                onChange={(e) => {
+                  const newOptions = [...newQuestion.options];
+                  newOptions[index].text = e.target.value;
+                  setNewQuestion({...newQuestion, options: newOptions});
+                }}
+                required
+                style={{flex: 1}}
+              />
+              <input
+                type="number"
+                placeholder="Score"
+                value={option.score}
+                onChange={(e) => {
+                  const newOptions = [...newQuestion.options];
+                  newOptions[index].score = parseInt(e.target.value) || 0;
+                  setNewQuestion({...newQuestion, options: newOptions});
+                }}
+                min="0"
+                max="10"
+                required
+                style={{width: '80px'}}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="modal-actions">
+          <button type="button" onClick={() => setShowAddQuestion(false)}>
+            Cancel
+          </button>
+          <button type="submit">Add Question</button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
 
       {/* Edit Content Modal */}
       {showEditContent && (
