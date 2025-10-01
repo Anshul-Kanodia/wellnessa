@@ -5,6 +5,16 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+// Import database services
+const {
+  connectDatabase,
+  disconnectDatabase,
+  userService,
+  assessmentService,
+  resultService,
+  contentService,
+} = require('./database');
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -23,153 +33,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../client/build')));
-
-// In-memory data storage (replace with database in production)
-let users = [
-  {
-    id: 1,
-    username: 'user1',
-    password: '$2b$10$rQZ8kHWKtGXGvqWvqWvqWOeKkKkKkKkKkKkKkKkKkKkKkKkKkKkKk', // password: user123
-    email: 'user1@example.com',
-    name: 'John Doe',
-    accessLevel: 1,
-    createdAt: new Date(),
-    nextAssessment: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    assessmentsDue: true
-  },
-  {
-    id: 2,
-    username: 'admin1',
-    password: '$2b$10$rQZ8kHWKtGXGvqWvqWvqWOeKkKkKkKkKkKkKkKkKkKkKkKkKkKkKk', // password: admin123
-    email: 'admin1@example.com',
-    name: 'Jane Smith',
-    accessLevel: 2,
-    createdAt: new Date()
-  },
-  {
-    id: 3,
-    username: 'superadmin',
-    password: '$2b$10$rQZ8kHWKtGXGvqWvqWvqWOeKkKkKkKkKkKkKkKkKkKkKkKkKkKkKk', // password: super123
-    email: 'superadmin@example.com',
-    name: 'Super Admin',
-    accessLevel: 3,
-    createdAt: new Date()
-  }
-];
-
-let assessments = [
-  {
-    id: 1,
-    title: 'Health Assessment Q1 2024',
-    description: 'Quarterly health and wellness assessment',
-    groups: [
-      {
-        id: 1,
-        name: 'Physical Health',
-        subgroups: [
-          {
-            id: 1,
-            name: 'Exercise & Fitness',
-            questions: [
-              {
-                id: 1,
-                question: 'How often do you exercise per week?',
-                options: [
-                  { id: 'a', text: 'Never', score: 0 },
-                  { id: 'b', text: '1-2 times', score: 2 },
-                  { id: 'c', text: '3-4 times', score: 4 },
-                  { id: 'd', text: '5+ times', score: 5 }
-                ]
-              },
-              {
-                id: 2,
-                question: 'How would you rate your current fitness level?',
-                options: [
-                  { id: 'a', text: 'Poor', score: 1 },
-                  { id: 'b', text: 'Fair', score: 2 },
-                  { id: 'c', text: 'Good', score: 4 },
-                  { id: 'd', text: 'Excellent', score: 5 }
-                ]
-              }
-            ]
-          },
-          {
-            id: 2,
-            name: 'Nutrition',
-            questions: [
-              {
-                id: 3,
-                question: 'How many servings of fruits and vegetables do you eat daily?',
-                options: [
-                  { id: 'a', text: '0-1', score: 1 },
-                  { id: 'b', text: '2-3', score: 2 },
-                  { id: 'c', text: '4-5', score: 4 },
-                  { id: 'd', text: '6+', score: 5 }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: 2,
-        name: 'Mental Health',
-        subgroups: [
-          {
-            id: 3,
-            name: 'Stress Management',
-            questions: [
-              {
-                id: 4,
-                question: 'How well do you manage stress?',
-                options: [
-                  { id: 'a', text: 'Very poorly', score: 1 },
-                  { id: 'b', text: 'Poorly', score: 2 },
-                  { id: 'c', text: 'Well', score: 4 },
-                  { id: 'd', text: 'Very well', score: 5 }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    active: true,
-    createdAt: new Date()
-  }
-];
-
-let userAssessmentResults = [
-  {
-    id: 1,
-    userId: 1,
-    assessmentId: 1,
-    responses: [
-      { questionId: 1, selectedOption: 'c', score: 4 },
-      { questionId: 2, selectedOption: 'b', score: 2 },
-      { questionId: 3, selectedOption: 'c', score: 4 },
-      { questionId: 4, selectedOption: 'c', score: 4 }
-    ],
-    totalScore: 14,
-    maxScore: 20,
-    percentage: 70,
-    completedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    feedback: 'Good progress! Focus on improving fitness level and stress management.'
-  }
-];
-
-let homePageContent = {
-  hero: {
-    title: 'Wellnessa',
-    subtitle: 'Your comprehensive healthcare management platform for better patient outcomes'
-  },
-  sections: {
-    product: {
-      title: 'Our Product',
-      description: 'Comprehensive digital health platform that enables healthcare providers to deliver personalized care, track patient progress, and improve health outcomes through innovative technology solutions.'
-    }
-  }
-};
 
 // Authentication middleware
 const authenticateToken = (req, res, next) => {
@@ -199,20 +62,26 @@ const authorize = (requiredLevel) => {
   };
 };
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    database: 'connected' 
+  });
+});
+
 // Auth routes
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    const user = users.find(u => u.username === username);
+    const user = await userService.findUserByUsername(username);
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // For demo purposes, we'll use a simple password comparison
-    // In production, use bcrypt.compare(password, user.password)
-    const validPassword = password === 'user123' || password === 'admin123' || password === 'super123';
-    
+    const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -240,55 +109,63 @@ app.post('/api/auth/login', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Login error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
 // User routes (Level 1+)
-app.get('/api/user/profile', authenticateToken, (req, res) => {
-  const user = users.find(u => u.id === req.user.id);
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+app.get('/api/user/profile', authenticateToken, async (req, res) => {
+  try {
+    const user = await userService.findUserById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json(user);
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-  
-  res.json({
-    id: user.id,
-    username: user.username,
-    name: user.name,
-    email: user.email,
-    accessLevel: user.accessLevel,
-    nextAssessment: user.nextAssessment,
-    assessmentsDue: user.assessmentsDue
-  });
 });
 
-app.get('/api/user/assessments/due', authenticateToken, (req, res) => {
-  const user = users.find(u => u.id === req.user.id);
-  if (!user || !user.assessmentsDue) {
-    return res.json([]);
+app.get('/api/user/assessments/due', authenticateToken, async (req, res) => {
+  try {
+    const user = await userService.findUserById(req.user.id);
+    if (!user || !user.assessmentsDue) {
+      return res.json([]);
+    }
+    
+    const dueAssessments = await assessmentService.getActiveAssessments();
+    res.json(dueAssessments);
+  } catch (error) {
+    console.error('Due assessments error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-  
-  const dueAssessments = assessments.filter(a => a.active);
-  res.json(dueAssessments);
 });
 
-app.get('/api/user/assessments/:id', authenticateToken, (req, res) => {
-  const assessmentId = parseInt(req.params.id);
-  const assessment = assessments.find(a => a.id === assessmentId);
-  
-  if (!assessment) {
-    return res.status(404).json({ error: 'Assessment not found' });
+app.get('/api/user/assessments/:id', authenticateToken, async (req, res) => {
+  try {
+    const assessmentId = parseInt(req.params.id);
+    const assessment = await assessmentService.getAssessmentById(assessmentId);
+    
+    if (!assessment) {
+      return res.status(404).json({ error: 'Assessment not found' });
+    }
+    
+    res.json(assessment);
+  } catch (error) {
+    console.error('Assessment fetch error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-  
-  res.json(assessment);
 });
 
-app.post('/api/user/assessments/:id/submit', authenticateToken, (req, res) => {
+app.post('/api/user/assessments/:id/submit', authenticateToken, async (req, res) => {
   try {
     const assessmentId = parseInt(req.params.id);
     const { responses } = req.body;
     
-    const assessment = assessments.find(a => a.id === assessmentId);
+    const assessment = await assessmentService.getAssessmentById(assessmentId);
     if (!assessment) {
       return res.status(404).json({ error: 'Assessment not found' });
     }
@@ -331,185 +208,265 @@ app.post('/api/user/assessments/:id/submit', authenticateToken, (req, res) => {
       feedback = 'We recommend speaking with a healthcare provider about your wellness plan.';
     }
 
-    const result = {
-      id: userAssessmentResults.length + 1,
+    const resultData = {
       userId: req.user.id,
       assessmentId,
       responses: scoredResponses,
       totalScore,
       maxScore,
       percentage,
-      completedAt: new Date(),
       feedback
     };
 
-    userAssessmentResults.push(result);
+    const result = await resultService.createAssessmentResult(resultData);
     
     // Update user's next assessment date
-    const user = users.find(u => u.id === req.user.id);
-    if (user) {
-      user.nextAssessment = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 days
-      user.assessmentsDue = false;
-    }
+    await userService.updateUser(req.user.id, {
+      nextAssessment: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+      assessmentsDue: false
+    });
 
     res.json(result);
   } catch (error) {
+    console.error('Assessment submission error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-app.get('/api/user/results', authenticateToken, (req, res) => {
-  const userResults = userAssessmentResults.filter(r => r.userId === req.user.id);
-  res.json(userResults);
+app.get('/api/user/results', authenticateToken, async (req, res) => {
+  try {
+    const userResults = await resultService.getUserResults(req.user.id);
+    res.json(userResults);
+  } catch (error) {
+    console.error('User results error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
-app.get('/api/user/analytics', authenticateToken, (req, res) => {
-  const userResults = userAssessmentResults.filter(r => r.userId === req.user.id);
-  
-  if (userResults.length === 0) {
-    return res.json({ trend: 'no-data', message: 'No assessment data available' });
+app.get('/api/user/analytics', authenticateToken, async (req, res) => {
+  try {
+    const analytics = await resultService.getUserAnalytics(req.user.id);
+    res.json(analytics);
+  } catch (error) {
+    console.error('User analytics error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-
-  // Simple trend analysis
-  const sortedResults = userResults.sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));
-  const scores = sortedResults.map(r => r.percentage);
-  
-  let trend = 'stable';
-  if (scores.length > 1) {
-    const firstHalf = scores.slice(0, Math.ceil(scores.length / 2));
-    const secondHalf = scores.slice(Math.ceil(scores.length / 2));
-    
-    const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
-    const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
-    
-    if (secondAvg > firstAvg + 5) trend = 'improving';
-    else if (secondAvg < firstAvg - 5) trend = 'declining';
-  }
-
-  res.json({
-    trend,
-    latestScore: scores[scores.length - 1],
-    averageScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
-    totalAssessments: scores.length,
-    scores: sortedResults.map(r => ({
-      date: r.completedAt,
-      score: r.percentage
-    }))
-  });
 });
 
 // Admin routes (Level 2+)
-app.get('/api/admin/users', authenticateToken, authorize(2), (req, res) => {
-  const userList = users.map(u => ({
-    id: u.id,
-    username: u.username,
-    name: u.name,
-    email: u.email,
-    accessLevel: u.accessLevel,
-    createdAt: u.createdAt,
-    nextAssessment: u.nextAssessment,
-    assessmentsDue: u.assessmentsDue
-  }));
-  res.json(userList);
+app.get('/api/admin/users', authenticateToken, authorize(2), async (req, res) => {
+  try {
+    const users = await userService.getAllUsers();
+    res.json(users);
+  } catch (error) {
+    console.error('Admin users error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
-app.post('/api/admin/users', authenticateToken, authorize(2), (req, res) => {
+app.post('/api/admin/users', authenticateToken, authorize(2), async (req, res) => {
   try {
     const { username, password, email, name, accessLevel = 1 } = req.body;
     
-    if (users.find(u => u.username === username)) {
+    const existingUser = await userService.findUserByUsername(username);
+    if (existingUser) {
       return res.status(400).json({ error: 'Username already exists' });
     }
 
-    const newUser = {
-      id: Math.max(...users.map(u => u.id)) + 1,
+    const userData = {
       username,
-      password: password, // In production, hash with bcrypt
+      password,
       email,
       name,
       accessLevel: Math.min(accessLevel, req.user.accessLevel - 1), // Can't create users with higher access
-      createdAt: new Date(),
       nextAssessment: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       assessmentsDue: true
     };
 
-    users.push(newUser);
-    
-    res.json({
-      id: newUser.id,
-      username: newUser.username,
-      name: newUser.name,
-      email: newUser.email,
-      accessLevel: newUser.accessLevel,
-      createdAt: newUser.createdAt
-    });
+    const newUser = await userService.createUser(userData);
+    res.json(newUser);
   } catch (error) {
+    console.error('Create user error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-app.get('/api/admin/results', authenticateToken, authorize(2), (req, res) => {
-  const results = userAssessmentResults.map(r => {
-    const user = users.find(u => u.id === r.userId);
-    return {
-      ...r,
-      userName: user ? user.name : 'Unknown User'
-    };
-  });
-  res.json(results);
+app.get('/api/admin/results', authenticateToken, authorize(2), async (req, res) => {
+  try {
+    const results = await resultService.getAllResults();
+    res.json(results);
+  } catch (error) {
+    console.error('Admin results error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // Super Admin routes (Level 3)
-app.get('/api/superadmin/content', authenticateToken, authorize(3), (req, res) => {
-  res.json(homePageContent);
-});
-
-app.put('/api/superadmin/content', authenticateToken, authorize(3), (req, res) => {
-  homePageContent = { ...homePageContent, ...req.body };
-  res.json(homePageContent);
-});
-
-app.get('/api/superadmin/assessments', authenticateToken, authorize(3), (req, res) => {
-  res.json(assessments);
-});
-
-app.post('/api/superadmin/assessments', authenticateToken, authorize(3), (req, res) => {
-  const newAssessment = {
-    id: Math.max(...assessments.map(a => a.id)) + 1,
-    ...req.body,
-    createdAt: new Date()
-  };
-  assessments.push(newAssessment);
-  res.json(newAssessment);
-});
-
-app.put('/api/superadmin/assessments/:id', authenticateToken, authorize(3), (req, res) => {
-  const assessmentId = parseInt(req.params.id);
-  const index = assessments.findIndex(a => a.id === assessmentId);
-  
-  if (index === -1) {
-    return res.status(404).json({ error: 'Assessment not found' });
+app.get('/api/superadmin/content', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const content = await contentService.getHomePageContent();
+    res.json(content);
+  } catch (error) {
+    console.error('Content fetch error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-  
-  assessments[index] = { ...assessments[index], ...req.body };
-  res.json(assessments[index]);
 });
 
-app.delete('/api/superadmin/assessments/:id', authenticateToken, authorize(3), (req, res) => {
-  const assessmentId = parseInt(req.params.id);
-  const index = assessments.findIndex(a => a.id === assessmentId);
-  
-  if (index === -1) {
-    return res.status(404).json({ error: 'Assessment not found' });
+app.put('/api/superadmin/content', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const updatedContent = await contentService.updateHomePageContent(req.body);
+    res.json(updatedContent);
+  } catch (error) {
+    console.error('Content update error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
-  
-  assessments.splice(index, 1);
-  res.json({ message: 'Assessment deleted successfully' });
+});
+
+app.get('/api/superadmin/assessments', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const assessments = await assessmentService.getAllAssessments();
+    res.json(assessments);
+  } catch (error) {
+    console.error('Assessments fetch error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/superadmin/assessments', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const newAssessment = await assessmentService.createAssessment(req.body, req.user.id);
+    res.json(newAssessment);
+  } catch (error) {
+    console.error('Assessment creation error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // Public routes
-app.get('/api/content/home', (req, res) => {
-  res.json(homePageContent);
+app.get('/api/content/home', async (req, res) => {
+  try {
+    const content = await contentService.getHomePageContent();
+    res.json(content);
+  } catch (error) {
+    console.error('Public content error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Question Management API Endpoints (Super Admin only)
+
+// Get all questions with assessment details
+app.get('/api/admin/questions', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const questions = await prisma.assessmentQuestion.findMany({
+      include: {
+        subgroup: {
+          include: {
+            group: {
+              include: {
+                assessment: true
+              }
+            }
+          }
+        },
+        options: true
+      }
+    });
+
+    const formattedQuestions = questions.map(question => ({
+      id: question.id,
+      question: question.question,
+      assessmentId: question.subgroup.group.assessmentId,
+      assessmentTitle: question.subgroup.group.assessment.title,
+      groupName: question.subgroup.group.name,
+      subgroupName: question.subgroup.name,
+      options: question.options
+    }));
+
+    res.json(formattedQuestions);
+  } catch (error) {
+    console.error('Error fetching questions:', error);
+    res.status(500).json({ error: 'Failed to fetch questions' });
+  }
+});
+
+// Get all assessments
+app.get('/api/admin/assessments', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const assessments = await prisma.assessment.findMany({
+      include: {
+        groups: {
+          include: {
+            subgroups: true
+          }
+        }
+      }
+    });
+    res.json(assessments);
+  } catch (error) {
+    console.error('Error fetching assessments:', error);
+    res.status(500).json({ error: 'Failed to fetch assessments' });
+  }
+});
+
+// Add new question
+app.post('/api/admin/questions', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const { question, assessmentId, groupId, subgroupId, options } = req.body;
+
+    if (!question || !subgroupId || !options) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const result = await prisma.$transaction(async (prisma) => {
+      const newQuestion = await prisma.assessmentQuestion.create({
+        data: {
+          question,
+          subgroupId: parseInt(subgroupId)
+        }
+      });
+
+      const questionOptions = await Promise.all(
+        options.map((option, index) =>
+          prisma.questionOption.create({
+            data: {
+              questionId: newQuestion.id,
+              optionKey: String.fromCharCode(97 + index),
+              text: option.text,
+              score: parseInt(option.score)
+            }
+          })
+        )
+      );
+
+      return { ...newQuestion, options: questionOptions };
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error creating question:', error);
+    res.status(500).json({ error: 'Failed to create question' });
+  }
+});
+
+// Delete question
+app.delete('/api/admin/questions/:id', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const questionId = parseInt(req.params.id);
+
+    await prisma.assessmentQuestion.delete({
+      where: { id: questionId }
+    });
+
+    res.json({ message: 'Question deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting question:', error);
+    if (error.code === 'P2025') {
+      res.status(404).json({ error: 'Question not found' });
+    } else {
+      res.status(500).json({ error: 'Failed to delete question' });
+    }
+  }
 });
 
 // Serve React app
@@ -517,10 +474,48 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log('\nDemo Credentials:');
-  console.log('User (Level 1): username: user1, password: user123');
-  console.log('Admin (Level 2): username: admin1, password: admin123');
-  console.log('Super Admin (Level 3): username: superadmin, password: super123');
+// Error handling middleware
+app.use((error, req, res, next) => {
+  console.error('Unhandled error:', error);
+  res.status(500).json({ error: 'Internal server error' });
 });
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Shutting down gracefully...');
+  await disconnectDatabase();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\n🛑 Shutting down gracefully...');
+  await disconnectDatabase();
+  process.exit(0);
+});
+
+// Start server
+async function startServer() {
+  try {
+    // Connect to database
+    const dbConnected = await connectDatabase();
+    if (!dbConnected) {
+      console.error('❌ Failed to connect to database. Exiting...');
+      process.exit(1);
+    }
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log('\n📋 Demo Credentials:');
+      console.log('👤 User (Level 1): username: user1, password: password123');
+      console.log('👨‍💼 Admin (Level 2): username: admin1, password: admin123');
+      console.log('👨‍💻 Super Admin (Level 3): username: superadmin, password: super123');
+      console.log('\n🔗 API Health Check: http://localhost:' + PORT + '/api/health');
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
