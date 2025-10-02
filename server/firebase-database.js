@@ -1,4 +1,4 @@
-const { initializeFirebase, getFirestore } = require('./firebase-config');
+const { initializeFirebase, getFirestore } = require('./firebase-config-base64');
 const bcrypt = require('bcryptjs');
 
 // Initialize Firebase
