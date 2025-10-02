@@ -353,12 +353,63 @@ app.get('/api/content/home', async (req, res) => {
   }
 });
 
+// Missing endpoints that SuperAdminDashboard needs
+app.get('/api/assessments', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const assessments = await assessmentService.getAllAssessments();
+    res.json(assessments);
+  } catch (error) {
+    console.error('Assessments error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/content', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const content = await contentService.getHomePageContent();
+    res.json([content]); // Return as array for compatibility
+  } catch (error) {
+    console.error('Content error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/questionnaire', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    res.json([]); // Placeholder - return empty array for now
+  } catch (error) {
+    console.error('Questionnaire error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Question Management API Endpoints (Super Admin only)
 
 // Get all questions with assessment details
 app.get('/api/admin/questions', authenticateToken, authorize(3), async (req, res) => {
   try {
-    res.json([]); // Simplified - remove Prisma code
+    const assessments = await assessmentService.getAllAssessments();
+    const questions = [];
+    
+    assessments.forEach(assessment => {
+      assessment.groups?.forEach(group => {
+        group.subgroups?.forEach(subgroup => {
+          subgroup.questions?.forEach(question => {
+            questions.push({
+              id: question.id,
+              question: question.question,
+              assessmentId: assessment.id,
+              assessmentTitle: assessment.title,
+              groupName: group.name,
+              subgroupName: subgroup.name,
+              options: question.options
+            });
+          });
+        });
+      });
+    });
+
+    res.json(questions);
   } catch (error) {
     console.error('Error fetching questions:', error);
     res.status(500).json({ error: 'Failed to fetch questions' });
@@ -384,40 +435,59 @@ app.get('/api/admin/assessments', authenticateToken, authorize(3), async (req, r
   }
 });
 
-// Add new question
+// Add new question (Firebase compatible)
 app.post('/api/admin/questions', authenticateToken, authorize(3), async (req, res) => {
   try {
-    const { question, assessmentId, groupId, subgroupId, options } = req.body;
+    const { question, assessmentId, groupName, subgroupName, options } = req.body;
 
-    if (!question || !subgroupId || !options) {
+    if (!question || !assessmentId || !groupName || !subgroupName || !options) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const result = await prisma.$transaction(async (prisma) => {
-      const newQuestion = await prisma.assessmentQuestion.create({
-        data: {
-          question,
-          subgroupId: parseInt(subgroupId)
-        }
-      });
+    // Get the assessment
+    const assessment = await assessmentService.getAssessmentById(assessmentId);
+    if (!assessment) {
+      return res.status(404).json({ error: 'Assessment not found' });
+    }
 
-      const questionOptions = await Promise.all(
-        options.map((option, index) =>
-          prisma.questionOption.create({
-            data: {
-              questionId: newQuestion.id,
-              optionKey: String.fromCharCode(97 + index),
-              text: option.text,
-              score: parseInt(option.score)
-            }
-          })
-        )
-      );
+    // Find or create the group and subgroup
+    let targetGroup = assessment.groups.find(g => g.name === groupName);
+    if (!targetGroup) {
+      targetGroup = {
+        id: Date.now().toString(),
+        name: groupName,
+        subgroups: []
+      };
+      assessment.groups.push(targetGroup);
+    }
 
-      return { ...newQuestion, options: questionOptions };
-    });
+    let targetSubgroup = targetGroup.subgroups.find(sg => sg.name === subgroupName);
+    if (!targetSubgroup) {
+      targetSubgroup = {
+        id: Date.now().toString(),
+        name: subgroupName,
+        questions: []
+      };
+      targetGroup.subgroups.push(targetSubgroup);
+    }
 
-    res.json(result);
+    // Create the new question
+    const newQuestion = {
+      id: Date.now().toString(),
+      question,
+      options: options.map((option, index) => ({
+        id: String.fromCharCode(97 + index),
+        text: option.text,
+        score: parseInt(option.score)
+      }))
+    };
+
+    targetSubgroup.questions.push(newQuestion);
+
+    // Update the assessment in Firebase
+    await assessmentService.updateAssessment(assessmentId, assessment);
+
+    res.json(newQuestion);
   } catch (error) {
     console.error('Error creating question:', error);
     res.status(500).json({ error: 'Failed to create question' });

@@ -35,7 +35,9 @@ const SuperAdminDashboard = () => {
 
   const [newQuestion, setNewQuestion] = useState({
     question: '',
-    subgroupId: '',
+    assessmentId: '',
+    groupName: '',
+    subgroupName: '',
     options: [
       { text: '', score: 0 },
       { text: '', score: 0 },
@@ -122,7 +124,7 @@ const SuperAdminDashboard = () => {
       if (response.ok) {
         setShowAddQuestion(false);
         setNewQuestion({
-          question: '', subgroupId: '',
+          question: '', assessmentId: '', groupName: '', subgroupName: '',
           options: [{ text: '', score: 0 }, { text: '', score: 0 }, { text: '', score: 0 }, { text: '', score: 0 }]
         });
         fetchData();
@@ -501,24 +503,35 @@ const SuperAdminDashboard = () => {
         </div>
         
         <div className="form-group">
-          <label>Select Category</label>
-          <select
-            value={newQuestion.subgroupId}
-            onChange={(e) => setNewQuestion({...newQuestion, subgroupId: e.target.value})}
-            required
-          >
-            <option value="">Select Category</option>
-            {assessments.flatMap(assessment =>
-              assessment.groups.flatMap(group =>
-                group.subgroups.map(subgroup => (
-                  <option key={subgroup.id} value={subgroup.id}>
-                    {assessment.title} - {group.name} - {subgroup.name}
-                  </option>
-                ))
-              )
-            )}
-          </select>
-        </div>
+  <label>Select Category</label>
+  <select
+    value={newQuestion.assessmentId}
+    onChange={(e) => {
+      const selectedValue = e.target.value;
+      if (selectedValue) {
+        const [assessmentId, groupName, subgroupName] = selectedValue.split('|');
+        setNewQuestion({
+          ...newQuestion, 
+          assessmentId, 
+          groupName, 
+          subgroupName
+        });
+      }
+    }}
+    required
+  >
+    <option value="">Select Category</option>
+    {assessments.flatMap(assessment =>
+      assessment.groups.flatMap(group =>
+        group.subgroups.map(subgroup => (
+          <option key={subgroup.id} value={`${assessment.id}|${group.name}|${subgroup.name}`}>
+            {assessment.title} - {group.name} - {subgroup.name}
+          </option>
+        ))
+      )
+    )}
+  </select>
+</div>
 
         <div className="form-group">
           <label>Answer Options</label>
