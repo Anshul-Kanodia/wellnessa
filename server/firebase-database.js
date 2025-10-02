@@ -396,6 +396,37 @@ const contentService = {
     }
   },
 
+
+  async updateHomePageContent(content) {
+    try {
+      const contentDoc = {
+        content,
+        updatedAt: new Date()
+      };
+
+      await db.collection('content').doc('home_page').set(contentDoc, { merge: true });
+      
+      return content;
+    } catch (error) {
+      throw new Error(`Failed to update home page content: ${error.message}`);
+    }
+  },
+
+  async updateAboutPageContent(content) {
+    try {
+      const contentDoc = {
+        content,
+        updatedAt: new Date()
+      };
+
+      await db.collection('content').doc('about_page').set(contentDoc, { merge: true });
+      
+      return content;
+    } catch (error) {
+      throw new Error(`Failed to update about page content: ${error.message}`);
+    }
+  },
+
   async updateAboutPageContent(content) {
     try {
       const contentDoc = {
