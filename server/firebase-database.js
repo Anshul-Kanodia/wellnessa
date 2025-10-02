@@ -305,19 +305,40 @@ const contentService = {
       const doc = await db.collection('content').doc('home_page').get();
       
       if (!doc.exists) {
-        // Return default content if none exists
-        return {
-          hero: {
-            title: 'Wellnessa',
-            subtitle: 'Your comprehensive healthcare management platform'
-          },
-          sections: {
-            product: {
-              title: 'Our Product',
-              description: 'Comprehensive digital health platform for better patient outcomes.'
-            }
-          }
-        };
+                // Return default content structure for all sections
+                return {
+                  hero: {
+                    title: 'Wellnessa',
+                    subtitle: 'Your comprehensive healthcare management platform for better patient outcomes'
+                  },
+                  accreditations: {
+                    title: 'Accreditations'
+                  },
+                  product: {
+                    title: 'Our Product',
+                    description1: 'Comprehensive digital health platform that enables healthcare providers to deliver personalized care, track patient progress, and improve health outcomes through innovative technology solutions.',
+                    description2: 'Our platform integrates seamlessly with existing healthcare systems to provide real-time insights and streamlined workflows for better patient care.'
+                  },
+                  howItWorks: {
+                    title: 'How it works',
+                    subtitle: 'Step-by-step implementation',
+                    steps: [
+                      { number: 1, title: 'Lorem Ipsum', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+                      { number: 2, title: 'Lorem Ipsum', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+                      { number: 3, title: 'Lorem Ipsum', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+                      { number: 4, title: 'Lorem Ipsum', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+                      { number: 5, title: 'Lorem Ipsum', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' }
+                    ]
+                  },
+                  testimonials: {
+                    title: 'Testimonials',
+                    items: [
+                      { name: 'Anshul Kanodia', role: 'CEO and Founder', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+                      { name: 'Anshul Kanodia', role: 'CEO and Founder', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
+                      { name: 'Anshul Kanodia', role: 'CEO and Founder', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' }
+                    ]
+                  }
+                };
       }
 
       return doc.data().content;
