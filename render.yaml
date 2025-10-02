@@ -9,17 +9,21 @@ services:
       - key: NODE_ENV
         value: production
       - key: JWT_SECRET
-        generateValue: true
+        value: wellnessa_production_jwt_secret_key_2024_secure
       - key: PORT
         value: 10000
       - key: FRONTEND_URL
         value: https://wellnessaprivateclone-bi861f1ky-anshul-kanodias-projects.vercel.app
       - key: BCRYPT_ROUNDS
         value: 12
+      - key: FIREBASE_PROJECT_ID
+        value: wellnessadb
+      - key: FIREBASE_PRIVATE_KEY_ID
+        value: 11ea111906a1e0939730223fa103909ee6a22daf
+      - key: FIREBASE_PRIVATE_KEY
+        value: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDEPF10kckFpims\niJ7wWz2uwNjvWLIqH+3yY1zcjAOdsT2rr0PG2Az5uRzgzP2ETxcE96lT0ZzQX3Pp\nqaRnBWySHq9T/dCrVVLh/zxNTkgALxqpS3I6MlPkK+OLOgGcAvPWM+YbzTPlErcx\n4o2Ia4dsAw0kXSxyeW8GUSXdjZidORxroeoKOPqiGKXYvodqS8p1K9SYr4vcpjIW\nEmlnq8YZNW4G1GEPnZ0OujHEgCpQ7Q2mYtkVJT8hwNb9Ezsw2m1pN6jNjkKRpFsE\nY2T84tWiGdiDtHjVmaFsMOu311SJ608+99sj+tYC6lMgkjNhDokYRSMjsdoqzUrI\n3g0KNp5zAgMBAAECggEADtSlF39BGw0wzxpQMMgkhEWM36HrbSWWnSAHT5/BUjSn\n/Ya0b526dVEZLqAvdMVpbvWstWn9GP5tyzYH98VALFbnV0iycZB0QCJDE3CcHm9w\n62SJUH6nOnJasxYCMyFB/mlTtbwvdNuSPtHpcmr2BCLC5oGoL0qgKnENlI3z/8XE\nRrdCubruwgslDqySWSkQwt7hsIxm96l9LMKeZXDzQoOGO7Nsgq4c+yejkuK+fcxA\nuiZ9bqefOkO/RxSXNFacVTk71O1yfi+QGH0dk9I2z/KZu9r5IqGp7Cpjq2pGyDDm\nzi9mbdLam0Wm+F4f3RCeFUr2GM0PHex7qOhK8DQNcQKBgQDq1GRH0qMAuABeMF76\npkPP7iTDGIPu2bq7RPOFVdUAsGeftMntwku2xd7G9ZSekeByRU3HWh7lNNBl5mnV\n7Qsw3yWBpwxU1vUcSeiUJ+Pxyd11uyge2Qz66XbeiB9e2g1Jcf4HK5IjCwjg5p/E\nfD1/RaeM3czPNp9j6Z4780GC6wKBgQDV7UUa9KubfFGymucEbq0rrxpEO+N8IslO\n5wvPjBwY6OSCVKSREVUEqXpDCOUrRcF684x8MihrF1KrJADijhd1Zv+lg5ROm4Pd\ntiCRn51t8N5iwoQiSiPoAWSFG5BbsNBgtiv7tIflJhMNVaVOUmrZCTGLHwTVdbmG\n3wuExpYgmQKBgBgydHbWJIexbhBGibLoKPqm/lDAGPAmrVAYpcMqef1NMBBLz7bZ\nG3Yk43S632qLe4Yqz/3nsmFJ1ON7H5K0jz+k7rdyYBnp4G3ey8FgbuN+OnykIVk0\nYlsEbYQ2oIzkiRP1VAinG7LSs0KBYRsc9jVEFySzwiPj6/6elvh0c16rAoGAaECj\nBsnpv3JMViALKSvOlJVW1Z3h9KL3O855AQIkxzbn9WPOdyvdJNJ61KRHGll6OrLp\n6bR/4gCRtvlqvP3GDN7PAxgmdFBxaODS6mTA0c0qczKcNiGvcecL15phNW3rftYI\nhTerak6txjfQwWSE0ZQbYtMRBf3DFikoceJdUzECgYEArl7GTA/wOQnddqkyiQWW\n7OB1cXMH2uidASkAhQ7vCQJThED49fVuN6Vmo8UaaTrUKmyLkKAs3bXt4LcX3xeY\nLOkYBwiIGp0LNGlXbWFTWgMWnp0r8UTfVhmH7y31SnfZuz6ITv8WYuz4aEKMDAN/\n+1c0hQhulDL6c112OobEcA4=\n-----END PRIVATE KEY-----\n"
+      - key: FIREBASE_CLIENT_EMAIL
+        value: firebase-adminsdk-fbsvc@wellnessadb.iam.gserviceaccount.com
+      - key: FIREBASE_CLIENT_ID
+        value: 116664624453850710947
     healthCheckPath: /api/health
-
-databases:
-  - name: wellnessa-db
-    databaseName: wellnessa
-    user: wellnessa_user
-    plan: free

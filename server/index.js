@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-// Import database services
+// Import Firebase database services
 const {
   connectDatabase,
   disconnectDatabase,
@@ -13,7 +13,7 @@ const {
   assessmentService,
   resultService,
   contentService,
-} = require('./database');
+} = require('./firebase-database');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -67,7 +67,7 @@ app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
     timestamp: new Date().toISOString(),
-    database: 'connected' 
+    database: 'firebase-connected' 
   });
 });
 
@@ -81,7 +81,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const validPassword = password === user.password;
+    const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
@@ -505,7 +505,7 @@ async function startServer() {
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔥 Database: Firebase Firestore`);
       console.log('\n📋 Demo Credentials:');
       console.log('👤 User (Level 1): username: user1, password: password123');
       console.log('👨‍💼 Admin (Level 2): username: admin1, password: admin123');
