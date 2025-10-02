@@ -162,7 +162,7 @@ const UserDashboard = () => {
         )}
 
         {/* Analytics */}
-        {analytics && analytics.trend !== 'no-data' && (
+        {analytics && analytics.trend !== 'no-data' && analytics.trend && (
           <div className="dashboard-section">
             <h2>📊 Your Progress</h2>
             <div className="analytics-grid">
@@ -170,16 +170,16 @@ const UserDashboard = () => {
                 <div className="analytics-header">
                   <h3>Trend Analysis</h3>
                   <div className="trend-indicator" style={{ color: getTrendColor(analytics.trend) }}>
-                    {getTrendIcon(analytics.trend)} {analytics.trend.charAt(0).toUpperCase() + analytics.trend.slice(1)}
+                  {getTrendIcon(analytics.trend)} {analytics.trend ? analytics.trend.charAt(0).toUpperCase() + analytics.trend.slice(1) : 'Unknown'}
                   </div>
                 </div>
                 <div className="trend-stats">
                   <div className="trend-stat">
-                    <span className="trend-value">{analytics.averageScore}%</span>
+                    <span className="trend-value">{analytics.averageScore || 0}%</span>
                     <span className="trend-label">Average Score</span>
                   </div>
                   <div className="trend-stat">
-                    <span className="trend-value">{analytics.totalAssessments}</span>
+                    <span className="trend-value">{analytics.totalAssessments || 0}</span>
                     <span className="trend-label">Total Assessments</span>
                   </div>
                 </div>
@@ -188,18 +188,20 @@ const UserDashboard = () => {
               <div className="analytics-card chart">
                 <h3>Score History</h3>
                 <div className="score-chart">
-                  {analytics.scores.map((score, index) => (
+                {analytics.scores && analytics.scores.length > 0 ? analytics.scores.map((score, index) => (
                     <div key={index} className="score-bar">
                       <div 
                         className="score-fill" 
                         style={{ 
-                          height: `${score.score}%`,
-                          backgroundColor: getScoreColor(score.score)
+                          height: `${score.score || 0}%`,
+                          backgroundColor: getScoreColor(score.score || 0)
                         }}
                       ></div>
-                      <div className="score-date">{formatDate(score.date)}</div>
+                      <div className="score-date">{score.date ? formatDate(score.date) : 'N/A'}</div>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="no-scores">No score history available</div>
+                  )}
                 </div>
               </div>
             </div>

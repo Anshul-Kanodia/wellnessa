@@ -185,6 +185,20 @@ const assessmentService = {
     } catch (error) {
       throw new Error(`Failed to get active assessments: ${error.message}`);
     }
+  },
+  
+  async updateAssessment(id, assessmentData) {
+    try {
+      const updateDoc = {
+        ...assessmentData,
+        updatedAt: new Date()
+      };
+  
+      await db.collection('assessments').doc(id).update(updateDoc);
+      return await this.getAssessmentById(id);
+    } catch (error) {
+      throw new Error(`Failed to update assessment: ${error.message}`);
+    }
   }
 };
 
