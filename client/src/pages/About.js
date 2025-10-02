@@ -1,20 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './About.css';
 
 const About = () => {
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      const response = await fetch('/api/content/about');
+      if (response.ok) {
+        const data = await response.json();
+        setContent(data);
+      }
+    } catch (error) {
+      console.error('Error fetching about content:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (!content) {
+    return <div className="error">Failed to load content</div>;
+  }
+
   return (
     <div className="about">
       {/* Hero Section */}
       <section className="about-hero">
         <div className="container">
           <div className="about-hero-content">
-            <h1 className="about-title">About Wellnessa</h1>
+            <h1 className="about-title">{content.hero?.title || 'About Wellnessa'}</h1>
             <p className="about-description">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud 
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+              {content.hero?.description || 'Lorem ipsum dolor sit amet...'}
             </p>
-            <button className="btn btn-primary">Get Started</button>
+            <button className="btn btn-primary">{content.hero?.buttonText || 'Get Started'}</button>
           </div>
         </div>
         <div className="about-hero-curve"></div>
@@ -26,18 +53,12 @@ const About = () => {
           <div className="container">
             <div className="why-content">
               <div className="why-text">
-                <h2 className="section-title white-text">Why Wellnessa?</h2>
+                <h2 className="section-title white-text">{content.whyWellnessa?.title || 'Why Wellnessa?'}</h2>
                 <p className="why-description">
-                  Wellnessa offers an expert, convenient approach that will fit 
-                  seamlessly into your existing workflow. Our platform provides 
-                  comprehensive healthcare management solutions that enable providers 
-                  to deliver personalized care while improving patient outcomes through 
-                  innovative technology and streamlined processes.
+                  {content.whyWellnessa?.description1 || 'Wellnessa offers an expert...'}
                 </p>
                 <p className="why-description">
-                  Our team of healthcare professionals and technology experts work 
-                  together to create solutions that address real-world challenges 
-                  in healthcare delivery and patient management.
+                  {content.whyWellnessa?.description2 || 'Our team of healthcare professionals...'}
                 </p>
               </div>
               <div className="why-illustration">
@@ -78,11 +99,9 @@ const About = () => {
               </div>
             </div>
             <div className="monitor-text">
-              <h2 className="section-title">Monitor patient mental health from afar</h2>
+              <h2 className="section-title">{content.monitorPatient?.title || 'Monitor patient mental health from afar'}</h2>
               <p className="monitor-description">
-                Our comprehensive remote monitoring system allows healthcare providers 
-                to track patient mental health indicators in real-time, ensuring 
-                continuous care and early intervention when needed.
+                {content.monitorPatient?.description || 'Our comprehensive remote monitoring system...'}
               </p>
             </div>
           </div>
@@ -93,64 +112,19 @@ const About = () => {
       <section className="our-values">
         <div className="values-bg">
           <div className="container">
-            <h2 className="section-title white-text">Our Values</h2>
-            <p className="values-subtitle white-text">What our team believes in</p>
+            <h2 className="section-title white-text">{content.values?.title || 'Our Values'}</h2>
+            <p className="values-subtitle white-text">{content.values?.subtitle || 'What our team believes in'}</p>
             
             <div className="values-grid">
-              <div className="value-item">
-                <div className="value-icon">
-                  <span>🎯</span>
+              {(content.values?.items || []).map((value, index) => (
+                <div key={index} className="value-item">
+                  <div className="value-icon">
+                    <span>{value.icon}</span>
+                  </div>
+                  <h3 className="value-title">{value.title}</h3>
+                  <p className="value-description">{value.description}</p>
                 </div>
-                <h3 className="value-title">Focusing in touch with our patients</h3>
-                <p className="value-description">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
-              </div>
-              
-              <div className="value-item">
-                <div className="value-icon">
-                  <span>💡</span>
-                </div>
-                <h3 className="value-title">Focusing in touch with our patients</h3>
-                <p className="value-description">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
-              </div>
-              
-              <div className="value-item">
-                <div className="value-icon">
-                  <span>🤝</span>
-                </div>
-                <h3 className="value-title">Focusing in touch with our patients</h3>
-                <p className="value-description">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
-              </div>
-              
-              <div className="value-item">
-                <div className="value-icon">
-                  <span>🔬</span>
-                </div>
-                <h3 className="value-title">Focusing in touch with our patients</h3>
-                <p className="value-description">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
-              </div>
-              
-              <div className="value-item">
-                <div className="value-icon">
-                  <span>❤️</span>
-                </div>
-                <h3 className="value-title">Focusing in touch with our patients</h3>
-                <p className="value-description">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -159,15 +133,15 @@ const About = () => {
       {/* Our Team Section */}
       <section className="our-team">
         <div className="container">
-          <h2 className="section-title">Our Team</h2>
+          <h2 className="section-title">{content.team?.title || 'Our Team'}</h2>
           <div className="team-grid">
-            {[1, 2, 3].map((member) => (
-              <div key={member} className="team-member">
+            {(content.team?.members || []).map((member, index) => (
+              <div key={index} className="team-member">
                 <div className="member-photo">
                   <img src="/api/placeholder/200/200" alt="Team Member" />
                 </div>
-                <h4 className="member-name">Anshul Kanojia</h4>
-                <p className="member-role">CEO and Founder</p>
+                <h4 className="member-name">{member.name}</h4>
+                <p className="member-role">{member.role}</p>
               </div>
             ))}
           </div>

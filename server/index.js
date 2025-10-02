@@ -435,6 +435,57 @@ app.get('/api/admin/assessments', authenticateToken, authorize(3), async (req, r
   }
 });
 
+// Content management endpoints
+app.get('/api/content/all', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const allContent = await contentService.getAllContent();
+    res.json(allContent);
+  } catch (error) {
+    console.error('All content error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/content/home', async (req, res) => {
+  try {
+    const content = await contentService.getHomePageContent();
+    res.json(content);
+  } catch (error) {
+    console.error('Home content error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/content/about', async (req, res) => {
+  try {
+    const content = await contentService.getAboutPageContent();
+    res.json(content);
+  } catch (error) {
+    console.error('About content error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.put('/api/content/home', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const updatedContent = await contentService.updateHomePageContent(req.body);
+    res.json(updatedContent);
+  } catch (error) {
+    console.error('Home content update error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.put('/api/content/about', authenticateToken, authorize(3), async (req, res) => {
+  try {
+    const updatedContent = await contentService.updateAboutPageContent(req.body);
+    res.json(updatedContent);
+  } catch (error) {
+    console.error('About content update error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // Add new question (Firebase compatible)
 app.post('/api/admin/questions', authenticateToken, authorize(3), async (req, res) => {
   try {

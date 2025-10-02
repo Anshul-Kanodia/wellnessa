@@ -326,18 +326,83 @@ const contentService = {
     }
   },
 
-  async updateHomePageContent(content) {
+  async getAboutPageContent() {
+    try {
+      const doc = await db.collection('content').doc('about_page').get();
+      
+      if (!doc.exists) {
+        // Return default content structure for About page
+        return {
+          hero: {
+            title: 'About Wellnessa',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            buttonText: 'Get Started'
+          },
+          whyWellnessa: {
+            title: 'Why Wellnessa?',
+            description1: 'Wellnessa offers an expert, convenient approach that will fit seamlessly into your existing workflow.',
+            description2: 'Our team of healthcare professionals and technology experts work together to create solutions.'
+          },
+          monitorPatient: {
+            title: 'Monitor patient mental health from afar',
+            description: 'Our comprehensive remote monitoring system allows healthcare providers to track patient mental health indicators in real-time.'
+          },
+          values: {
+            title: 'Our Values',
+            subtitle: 'What our team believes in',
+            items: [
+              { icon: '🎯', title: 'Focusing in touch with our patients', description: 'Lorem ipsum dolor sit amet...' },
+              { icon: '💡', title: 'Innovation in Healthcare', description: 'Lorem ipsum dolor sit amet...' },
+              { icon: '🤝', title: 'Collaborative Care', description: 'Lorem ipsum dolor sit amet...' },
+              { icon: '🔬', title: 'Evidence-Based Solutions', description: 'Lorem ipsum dolor sit amet...' },
+              { icon: '❤️', title: 'Patient-Centered Approach', description: 'Lorem ipsum dolor sit amet...' }
+            ]
+          },
+          team: {
+            title: 'Our Team',
+            members: [
+              { name: 'Anshul Kanojia', role: 'CEO and Founder' },
+              { name: 'Anshul Kanojia', role: 'CEO and Founder' },
+              { name: 'Anshul Kanojia', role: 'CEO and Founder' }
+            ]
+          }
+        };
+      }
+
+      return doc.data().content;
+    } catch (error) {
+      throw new Error(`Failed to get about page content: ${error.message}`);
+    }
+  },
+
+  async updateAboutPageContent(content) {
     try {
       const contentDoc = {
         content,
         updatedAt: new Date()
       };
 
-      await db.collection('content').doc('home_page').set(contentDoc, { merge: true });
+      await db.collection('content').doc('about_page').set(contentDoc, { merge: true });
       
       return content;
     } catch (error) {
-      throw new Error(`Failed to update home page content: ${error.message}`);
+      throw new Error(`Failed to update about page content: ${error.message}`);
+    }
+  },
+
+  async getAllContent() {
+    try {
+      const [homeContent, aboutContent] = await Promise.all([
+        this.getHomePageContent(),
+        this.getAboutPageContent()
+      ]);
+
+      return {
+        home: homeContent,
+        about: aboutContent
+      };
+    } catch (error) {
+      throw new Error(`Failed to get all content: ${error.message}`);
     }
   }
 };

@@ -17,6 +17,10 @@ const SuperAdminDashboard = () => {
   const [showEditQuestionnaire, setShowEditQuestionnaire] = useState(false);
   const [selectedContent, setSelectedContent] = useState(null);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  // Add these new state variables
+  const [allContent, setAllContent] = useState({ home: {}, about: {} });
+  const [editingSection, setEditingSection] = useState(null);
+  const [sectionContent, setSectionContent] = useState({});
 
   const [newUser, setNewUser] = useState({
     username: '',
@@ -54,12 +58,10 @@ const SuperAdminDashboard = () => {
     try {
       const headers = getAuthHeaders();
       
-      const [usersRes, assessmentsRes, resultsRes, contentRes, questionnaireRes, questionsRes] = await Promise.all([
+      const [usersRes, assessmentsRes, resultsRes, questionsRes] = await Promise.all([
         fetch('/api/admin/users', { headers }),
         fetch('/api/assessments', { headers }),
         fetch('/api/admin/results', { headers }),
-        fetch('/api/content', { headers }),
-        fetch('/api/questionnaire', { headers }),
         fetch('/api/admin/questions', { headers })
       ]);
 
@@ -67,8 +69,9 @@ const SuperAdminDashboard = () => {
       if (usersRes.ok) setUsers(await usersRes.json());
       if (assessmentsRes.ok) setAssessments(await assessmentsRes.json());
       if (resultsRes.ok) setResults(await resultsRes.json());
-      if (contentRes.ok) setContent(await contentRes.json());
-      if (questionnaireRes.ok) setQuestionnaire(await questionnaireRes.json());
+      
+      // Fetch content
+      await fetchAllContent();
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -113,6 +116,27 @@ const SuperAdminDashboard = () => {
     }
   };
 
+    // Add this function to fetch all content
+    const fetchAllContent = async () => {
+      try {
+        const headers = getAuthHeaders();
+        const response = await fetch('/api/content/all', { headers });
+        if (response.ok) {
+          const content = await response.json();
+          setAllContent(content);
+        }
+      } catch (error) {
+        console.error('Error fetching content:', error);
+      }
+    };
+  
+    // Add this function to handle section editing
+    const handleEditSection = (page, section) => {
+      setEditingSection({ page, section });
+      setSectionContent(allContent[page][section] || {});
+      setShowEditContent(true);
+    };
+
   const handleAddQuestion = async (e) => {
     e.preventDefault();
     try {
@@ -154,23 +178,29 @@ const SuperAdminDashboard = () => {
   const handleSaveContent = async (e) => {
     e.preventDefault();
     try {
-      const url = selectedContent ? `/api/content/${selectedContent.id}` : '/api/content';
-      const method = selectedContent ? 'PUT' : 'POST';
+      if (!editingSection) return;
+      
+      const { page, section } = editingSection;
+      const updatedPageContent = {
+        ...allContent[page],
+        [section]: sectionContent
+      };
 
-      const response = await fetch(url, {
-        method,
+      const response = await fetch(`/api/content/${page}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeaders()
         },
-        body: JSON.stringify(newContent)
+        body: JSON.stringify(updatedPageContent)
       });
 
       if (response.ok) {
         setShowEditContent(false);
-        setSelectedContent(null);
-        setNewContent({ title: '', description: '', category: '', content: '' });
-        fetchData();
+        setEditingSection(null);
+        setSectionContent({});
+        fetchAllContent(); // Refresh content
+        alert('Content updated successfully!');
       }
     } catch (error) {
       console.error('Error saving content:', error);
@@ -289,35 +319,75 @@ const SuperAdminDashboard = () => {
     <div className="content-management">
       <div className="section-header">
         <h3>Content Management</h3>
-        <button className="btn-primary" onClick={() => {
-          setSelectedContent(null);
-          setNewContent({ title: '', description: '', category: '', content: '' });
-          setShowEditContent(true);
-        }}>
-          Add New Content
-        </button>
+        <p>Edit content for all website sections</p>
       </div>
       
-      <div className="content-grid">
-        {content.map(item => (
-          <div key={item.id} className="content-card">
-            <h4>{item.title}</h4>
-            <p>{item.description}</p>
-            <div className="content-meta">
-              <span className="category">{item.category}</span>
-              <button 
-                className="btn-secondary btn-small"
-                onClick={() => {
-                  setSelectedContent(item);
-                  setNewContent(item);
-                  setShowEditContent(true);
-                }}
-              >
-                Edit
-              </button>
+      <div className="content-sections">
+        {/* Home Page Sections */}
+        <div className="page-section">
+          <h4>🏠 Home Page</h4>
+          <div className="content-grid">
+            <div className="content-card" onClick={() => handleEditSection('home', 'hero')}>
+              <h5>Hero Section</h5>
+              <p>Main title and subtitle</p>
+              <button className="btn-secondary btn-small">Edit</button>
+            </div>
+            
+            <div className="content-card" onClick={() => handleEditSection('home', 'product')}>
+              <h5>Product Section</h5>
+              <p>Product description and features</p>
+              <button className="btn-secondary btn-small">Edit</button>
+            </div>
+            
+            <div className="content-card" onClick={() => handleEditSection('home', 'howItWorks')}>
+              <h5>How It Works</h5>
+              <p>Step-by-step process</p>
+              <button className="btn-secondary btn-small">Edit</button>
+            </div>
+            
+            <div className="content-card" onClick={() => handleEditSection('home', 'testimonials')}>
+              <h5>Testimonials</h5>
+              <p>Customer testimonials</p>
+              <button className="btn-secondary btn-small">Edit</button>
             </div>
           </div>
-        ))}
+        </div>
+  
+        {/* About Page Sections */}
+        <div className="page-section">
+          <h4>ℹ️ About Page</h4>
+          <div className="content-grid">
+            <div className="content-card" onClick={() => handleEditSection('about', 'hero')}>
+              <h5>About Hero</h5>
+              <p>About page introduction</p>
+              <button className="btn-secondary btn-small">Edit</button>
+            </div>
+            
+            <div className="content-card" onClick={() => handleEditSection('about', 'whyWellnessa')}>
+              <h5>Why Wellnessa</h5>
+              <p>Company value proposition</p>
+              <button className="btn-secondary btn-small">Edit</button>
+            </div>
+            
+            <div className="content-card" onClick={() => handleEditSection('about', 'monitorPatient')}>
+              <h5>Monitor Patient</h5>
+              <p>Remote monitoring features</p>
+              <button className="btn-secondary btn-small">Edit</button>
+            </div>
+            
+            <div className="content-card" onClick={() => handleEditSection('about', 'values')}>
+              <h5>Our Values</h5>
+              <p>Company values and beliefs</p>
+              <button className="btn-secondary btn-small">Edit</button>
+            </div>
+            
+            <div className="content-card" onClick={() => handleEditSection('about', 'team')}>
+              <h5>Our Team</h5>
+              <p>Team member information</p>
+              <button className="btn-secondary btn-small">Edit</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -578,42 +648,65 @@ const SuperAdminDashboard = () => {
   </div>
 )}
 
-      {/* Edit Content Modal */}
-      {showEditContent && (
+            {/* Edit Content Modal */}
+            {showEditContent && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>{selectedContent ? 'Edit Content' : 'Add New Content'}</h3>
+            <h3>{editingSection ? `Edit ${editingSection.page} - ${editingSection.section}` : 'Edit Content'}</h3>
             <form onSubmit={handleSaveContent}>
-              <input
-                type="text"
-                placeholder="Title"
-                value={newContent.title}
-                onChange={(e) => setNewContent({...newContent, title: e.target.value})}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Description"
-                value={newContent.description}
-                onChange={(e) => setNewContent({...newContent, description: e.target.value})}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Category"
-                value={newContent.category}
-                onChange={(e) => setNewContent({...newContent, category: e.target.value})}
-                required
-              />
-              <textarea
-                placeholder="Content"
-                value={newContent.content}
-                onChange={(e) => setNewContent({...newContent, content: e.target.value})}
-                rows="5"
-                required
-              />
+              {editingSection && (
+                <div className="section-editor">
+                  {/* Dynamic form fields based on section type */}
+                  {Object.keys(sectionContent).map((key) => (
+                    <div key={key} className="form-group">
+                      <label>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
+                      {typeof sectionContent[key] === 'string' ? (
+                        key.includes('description') || key.includes('text') ? (
+                          <textarea
+                            value={sectionContent[key]}
+                            onChange={(e) => setSectionContent({
+                              ...sectionContent,
+                              [key]: e.target.value
+                            })}
+                            rows="3"
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            value={sectionContent[key]}
+                            onChange={(e) => setSectionContent({
+                              ...sectionContent,
+                              [key]: e.target.value
+                            })}
+                          />
+                        )
+                      ) : (
+                        <textarea
+                          value={JSON.stringify(sectionContent[key], null, 2)}
+                          onChange={(e) => {
+                            try {
+                              setSectionContent({
+                                ...sectionContent,
+                                [key]: JSON.parse(e.target.value)
+                              });
+                            } catch (err) {
+                              // Handle JSON parse error
+                            }
+                          }}
+                          rows="5"
+                          placeholder="JSON format for complex data"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="modal-actions">
-                <button type="button" onClick={() => setShowEditContent(false)}>Cancel</button>
+                <button type="button" onClick={() => {
+                  setShowEditContent(false);
+                  setEditingSection(null);
+                  setSectionContent({});
+                }}>Cancel</button>
                 <button type="submit" className="btn-primary">Save</button>
               </div>
             </form>

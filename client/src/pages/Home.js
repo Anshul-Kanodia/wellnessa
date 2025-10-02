@@ -1,15 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Home.css';
 
 const Home = () => {
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const fetchContent = async () => {
+    try {
+      const response = await fetch('/api/content/home');
+      if (response.ok) {
+        const data = await response.json();
+        setContent(data);
+      }
+    } catch (error) {
+      console.error('Error fetching home content:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (!content) {
+    return <div className="error">Failed to load content</div>;
+  }
+
   return (
     <div className="home">
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-container">
-          <h1 className="hero-title">Wellnessa</h1>
+          <h1 className="hero-title">{content.hero?.title || 'Wellnessa'}</h1>
           <p className="hero-subtitle">
-            Your comprehensive healthcare management platform for better patient outcomes
+            {content.hero?.subtitle || 'Your comprehensive healthcare management platform'}
           </p>
         </div>
       </section>
@@ -17,7 +46,7 @@ const Home = () => {
       {/* Accreditations Section */}
       <section className="accreditations">
         <div className="section-container">
-          <h2 className="section-title">Accreditations</h2>
+          <h2 className="section-title">{content.accreditations?.title || 'Accreditations'}</h2>
           <div className="accreditation-badges">
             {[1, 2, 3, 4, 5].map((item, index) => (
               <div key={item} className={`badge badge-${index + 1}`}></div>
@@ -31,15 +60,12 @@ const Home = () => {
         <div className="section-container">
           <div className="product-content">
             <div className="product-text">
-              <h2>Our Product</h2>
+              <h2>{content.product?.title || 'Our Product'}</h2>
               <p className="product-description">
-                Comprehensive digital health platform that enables healthcare providers to deliver 
-                personalized care, track patient progress, and improve health outcomes through 
-                innovative technology solutions.
+                {content.product?.description1 || 'Comprehensive digital health platform...'}
               </p>
               <p className="product-description">
-                Our platform integrates seamlessly with existing healthcare systems to provide 
-                real-time insights and streamlined workflows for better patient care.
+                {content.product?.description2 || 'Our platform integrates seamlessly...'}
               </p>
             </div>
             <div className="product-visual">
@@ -58,17 +84,11 @@ const Home = () => {
       {/* How It Works Section */}
       <section className="how-it-works">
         <div className="section-container">
-          <h2 className="section-title">How it works</h2>
-          <p className="section-subtitle">Step-by-step implementation</p>
+          <h2 className="section-title">{content.howItWorks?.title || 'How it works'}</h2>
+          <p className="section-subtitle">{content.howItWorks?.subtitle || 'Step-by-step implementation'}</p>
           
           <div className="steps">
-            {[
-              { number: 1, title: "Lorem Ipsum", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
-              { number: 2, title: "Lorem Ipsum", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
-              { number: 3, title: "Lorem Ipsum", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
-              { number: 4, title: "Lorem Ipsum", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
-              { number: 5, title: "Lorem Ipsum", description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
-            ].map((step) => (
+            {(content.howItWorks?.steps || []).map((step) => (
               <div key={step.number} className="step">
                 <div className="step-number">{step.number}</div>
                 <div className="step-content">
@@ -84,17 +104,14 @@ const Home = () => {
       {/* Testimonials Section */}
       <section className="testimonials">
         <div className="section-container">
-          <h2 className="section-title">Testimonials</h2>
+          <h2 className="section-title">{content.testimonials?.title || 'Testimonials'}</h2>
           <div className="testimonial-grid">
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="testimonial-card">
+            {(content.testimonials?.items || []).map((testimonial, index) => (
+              <div key={index} className="testimonial-card">
                 <div className="testimonial-avatar"></div>
-                <h4 className="testimonial-name">Anshul Kanodia</h4>
-                <p className="testimonial-role">CEO and Founder</p>
-                <p className="testimonial-text">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do 
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
+                <h4 className="testimonial-name">{testimonial.name}</h4>
+                <p className="testimonial-role">{testimonial.role}</p>
+                <p className="testimonial-text">{testimonial.text}</p>
               </div>
             ))}
           </div>
