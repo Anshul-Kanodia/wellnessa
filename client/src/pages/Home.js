@@ -36,10 +36,15 @@ const Home = () => {
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-container">
-          <h1 className="hero-title">{content.hero?.title || 'Wellnessa'}</h1>
+          <div className="hero-logo">
+            <div className="logo-placeholder">
+              <span className="logo-icon">🏥</span>
+              <h1 className="hero-title">{content.hero?.title || 'Wellnessa'}</h1>
+            </div>
+          </div>
           <p className="hero-subtitle">
             {content.hero?.subtitle || 'Your comprehensive healthcare management platform'}
-          </p>
+            </p>
         </div>
       </section>
 
