@@ -1,7 +1,7 @@
 /* Header Styles */
 
 .header {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #4fd1c7 0%, #14b8a6 100%);
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
@@ -36,16 +36,15 @@
   align-items: center;
   gap: 10px;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 25px;
-  border: 2px dashed rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  transition: none;
 }
 
 .logo-placeholder:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
+  background: transparent;
+  border: none;
+  transform: none;
 }
 
 .logo-text {
