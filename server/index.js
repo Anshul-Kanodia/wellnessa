@@ -137,12 +137,28 @@ app.get('/api/user/assessments/due', authenticateToken, async (req, res) => {
     }
     
     const dueAssessments = [];
-if (user.nextAssessment && new Date(user.nextAssessment) <= new Date()) {
-  const activeAssessments = await assessmentService.getActiveAssessments();
-  if (activeAssessments.length > 0) {
-    dueAssessments.push(activeAssessments[0]);
-  }
-}
+
+    // Show assessments if user has assessmentsDue flag OR if nextAssessment is within 7 days
+    if (user.assessmentsDue || (user.nextAssessment && new Date(user.nextAssessment) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))) {
+      if (user.currentAssessmentId) {
+        const assessment = await assessmentService.getAssessmentById(user.currentAssessmentId);
+        if (assessment) {
+          dueAssessments.push({
+            ...assessment,
+            dueDate: user.nextAssessment
+          });
+        }
+      } else {
+        // Fallback to first active assessment
+        const activeAssessments = await assessmentService.getActiveAssessments();
+        if (activeAssessments.length > 0) {
+          dueAssessments.push({
+            ...activeAssessments[0],
+            dueDate: user.nextAssessment
+          });
+        }
+      }
+    }
     res.json(dueAssessments);
   } catch (error) {
     console.error('Due assessments error:', error);

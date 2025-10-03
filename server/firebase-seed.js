@@ -25,7 +25,10 @@ async function seedFirebaseDatabase() {
         email: 'user1@example.com',
         name: 'John Doe',
         accessLevel: 1,
-        assessmentsDue: true
+        assessmentsDue: true,
+        nextAssessment: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Due in 2 days
+        currentAssessmentId: 'assessment1',
+        createdAt: new Date()
       },
       {
         username: 'admin1',

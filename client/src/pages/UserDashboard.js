@@ -47,15 +47,17 @@ const UserDashboard = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return 'No date set';
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short', 
         day: 'numeric'
       });
     } catch (error) {
-      return 'Invalid Date';
+      return 'Date error';
     }
   };
 
