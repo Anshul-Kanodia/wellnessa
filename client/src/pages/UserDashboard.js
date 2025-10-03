@@ -153,14 +153,15 @@ const UserDashboard = () => {
     {results.length > 0 ? (
       <div className="results-grid">
         {results.slice(0, 3).map(result => (
-          <div key={result.id} className="result-card">
-            <h4>{result.assessmentTitle}</h4>
-            <div className="score" style={{ color: getScoreColor(result.percentage) }}>
-              {result.percentage}%
-            </div>
-            <p>Completed: {formatDate(result.completedAt)}</p>
-          </div>
-        ))}
+  <div key={result.id} className="result-card">
+    <h4>Assessment {result.assessmentId}</h4>
+    <div className="score" style={{ color: getScoreColor(result.percentage) }}>
+      {result.percentage}%
+    </div>
+    <p>Completed: {formatDate(result.completedAt)}</p>
+    <p className="feedback">{result.feedback}</p>
+  </div>
+))}
       </div>
     ) : (
       <p>No assessment results yet</p>

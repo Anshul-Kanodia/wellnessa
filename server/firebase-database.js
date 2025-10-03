@@ -236,10 +236,27 @@ const resultService = {
         .orderBy('completedAt', 'desc')
         .get();
       
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const results = [];
+      for (const doc of snapshot.docs) {
+        const resultData = doc.data();
+        
+        // Get assessment title
+        let assessmentTitle = 'Assessment';
+        try {
+          const assessment = await assessmentService.getAssessmentById(resultData.assessmentId);
+          assessmentTitle = assessment?.title || 'Assessment';
+        } catch (error) {
+          console.log('Could not fetch assessment title:', error);
+        }
+        
+        results.push({
+          id: doc.id,
+          ...resultData,
+          assessmentTitle
+        });
+      }
+      
+      return results;
     } catch (error) {
       throw new Error(`Failed to get user results: ${error.message}`);
     }
