@@ -21,6 +21,24 @@
   font-weight: 600;
 }
 
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.assign-select {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
 .dashboard-header p {
   margin: 0;
   font-size: 1.1rem;

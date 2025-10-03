@@ -47,11 +47,16 @@ const UserDashboard = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short', 
+        day: 'numeric'
+      });
+    } catch (error) {
+      return 'Invalid Date';
+    }
   };
 
   const getTrendIcon = (trend) => {
@@ -113,35 +118,53 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        {/* Due Assessments */}
-        {dueAssessments.length > 0 && (
-          <div className="dashboard-section">
-            <h2>📋 Assessments Due</h2>
-            <div className="assessments-grid">
-              {dueAssessments.map(assessment => (
-                <div key={assessment.id} className="assessment-card due">
-                  <div className="assessment-header">
-                    <h3>{assessment.title}</h3>
-                    <span className="due-badge">Due Now</span>
-                  </div>
-                  <p className="assessment-description">{assessment.description}</p>
-                  <div className="assessment-meta">
-                    <span>Questions: {assessment.groups.reduce((total, group) => 
-                      total + group.subgroups.reduce((subTotal, subgroup) => 
-                        subTotal + subgroup.questions.length, 0), 0)}</span>
-                    <span>Est. Time: 10-15 min</span>
-                  </div>
-                  <Link 
-                    to={`/assessment/${assessment.id}`} 
-                    className="take-assessment-btn"
-                  >
-                    Take Assessment
-                  </Link>
-                </div>
-              ))}
-            </div>
+        <div className="dashboard-content">
+  {/* Due Assessments */}
+  <div className="dashboard-section">
+    <h3>Due Assessments</h3>
+    {dueAssessments.length > 0 ? (
+      <div className="due-assessments">
+        {dueAssessments.map(assessment => (
+          <div key={assessment.id} className="assessment-card">
+            <h4>{assessment.title}</h4>
+            <p>Due: {assessment.dueDate ? formatDate(assessment.dueDate) : 'No due date'}</p>
+            <Link to={`/assessment/${assessment.id}`} className="btn-primary">
+              Take Assessment
+            </Link>
           </div>
-        )}
+        ))}
+      </div>
+    ) : (
+      <p>No assessments due</p>
+    )}
+  </div>
+
+  {/* Next Assessment */}
+  <div className="dashboard-section">
+    <h3>Next Scheduled Assessment</h3>
+    <p>{profile?.nextAssessment ? formatDate(profile.nextAssessment) : 'No upcoming assessments'}</p>
+  </div>
+
+  {/* Recent Results */}
+  <div className="dashboard-section">
+    <h3>Recent Assessment Results</h3>
+    {results.length > 0 ? (
+      <div className="results-grid">
+        {results.slice(0, 3).map(result => (
+          <div key={result.id} className="result-card">
+            <h4>{result.assessmentTitle}</h4>
+            <div className="score" style={{ color: getScoreColor(result.percentage) }}>
+              {result.percentage}%
+            </div>
+            <p>Completed: {formatDate(result.completedAt)}</p>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p>No assessment results yet</p>
+    )}
+  </div>
+</div>
 
         {/* Next Assessment Schedule */}
         {profile?.nextAssessment && !profile.assessmentsDue && (

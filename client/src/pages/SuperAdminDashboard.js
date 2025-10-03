@@ -163,6 +163,19 @@ const SuperAdminDashboard = () => {
       }
     };  
 
+    const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  try {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  } catch (error) {
+    return 'Invalid Date';
+  }
+};
+
   const handleAddQuestion = async (e) => {
     e.preventDefault();
     try {
@@ -296,63 +309,70 @@ const SuperAdminDashboard = () => {
         <div className="stat-status">✅ Online</div>
       </div>
     </div>
-  );
+    );
 
-  const renderUserManagement = () => (
-    <div className="user-management">
-      <div className="section-header">
-        <h3>User Management</h3>
-        <button className="btn-primary" onClick={() => setShowAddUser(true)}>
-          Add New User
-        </button>
-      </div>
-      
-      <div className="users-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Access Level</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map(user => (
-              <tr key={user.id}>
-                <td>{user.username}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{getAccessLevelBadge(user.accessLevel)}</td>
-                <td>
-                  <button 
-                    className="btn-danger btn-small"
-                    onClick={() => handleDeleteUser(user.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-                <td>
-  <select 
-    onChange={(e) => handleAssignAssessment(user.id, e.target.value)}
-    defaultValue=""
-  >
-    <option value="">Assign Assessment</option>
-    {assessments.map(assessment => (
-      <option key={assessment.id} value={assessment.id}>
-        {assessment.title}
-      </option>
-    ))}
-  </select>
-</td>
+    const renderUserManagement = () => (
+      <div className="user-management">
+        <div className="section-header">
+          <h3>User Management</h3>
+          <button className="btn-primary" onClick={() => setShowAddUser(true)}>
+            Add New User
+          </button>
+        </div>
+        
+        <div className="users-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Access Level</th>
+                <th>Created</th>
+                <th>Next Assessment</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map(user => (
+                <tr key={user.id}>
+                  <td>{user.name}</td>
+                  <td>{user.username}</td>
+                  <td>{user.email}</td>
+                  <td>{getAccessLevelBadge(user.accessLevel)}</td>
+                  <td>{user.createdAt ? formatDate(user.createdAt) : 'N/A'}</td>
+                  <td>{user.nextAssessment ? formatDate(user.nextAssessment) : 'No Assessment'}</td>
+                  <td>{user.assessmentsDue ? 'Assessment Due' : 'Up to Date'}</td>
+                  <td>
+                    <div className="action-buttons">
+                      <button 
+                        className="btn-danger btn-small"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        Delete
+                      </button>
+                      <select 
+                        onChange={(e) => handleAssignAssessment(user.id, e.target.value)}
+                        defaultValue=""
+                        className="assign-select"
+                      >
+                        <option value="">Assign Assessment</option>
+                        {assessments.map(assessment => (
+                          <option key={assessment.id} value={assessment.id}>
+                            {assessment.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  );
+    );
 
   const renderContentManagement = () => (
     <div className="content-management">
