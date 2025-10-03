@@ -136,7 +136,13 @@ app.get('/api/user/assessments/due', authenticateToken, async (req, res) => {
       return res.json([]);
     }
     
-    const dueAssessments = await assessmentService.getActiveAssessments();
+    const dueAssessments = [];
+if (user.nextAssessment && new Date(user.nextAssessment) <= new Date()) {
+  const activeAssessments = await assessmentService.getActiveAssessments();
+  if (activeAssessments.length > 0) {
+    dueAssessments.push(activeAssessments[0]);
+  }
+}
     res.json(dueAssessments);
   } catch (error) {
     console.error('Due assessments error:', error);
@@ -219,12 +225,13 @@ app.post('/api/user/assessments/:id/submit', authenticateToken, async (req, res)
     };
 
     const result = await resultService.createAssessmentResult(resultData);
-    
-    // Update user's next assessment date
-    await userService.updateUser(req.user.id, {
-      nextAssessment: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
-      assessmentsDue: false
-    });
+
+        // Update user's next assessment date (10 days from now)
+        await userService.updateUser(req.user.id, {
+          nextAssessment: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
+          assessmentsDue: true,
+          currentAssessmentId: assessmentId
+        });
 
     res.json(result);
   } catch (error) {
@@ -562,6 +569,23 @@ app.delete('/api/admin/questions/:id', authenticateToken, authorize(3), async (r
     } else {
       res.status(500).json({ error: 'Failed to delete question' });
     }
+  }
+});
+
+app.post('/api/admin/assign-assessment', authenticateToken, authorize(2), async (req, res) => {
+  try {
+    const { userId, assessmentId, dueDate } = req.body;
+    
+    await userService.updateUser(userId, {
+      currentAssessmentId: assessmentId,
+      nextAssessment: new Date(dueDate),
+      assessmentsDue: true
+    });
+    
+    res.json({ message: 'Assessment assigned successfully' });
+  } catch (error) {
+    console.error('Error assigning assessment:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

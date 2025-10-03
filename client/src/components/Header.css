@@ -1,154 +1,151 @@
 /* Header Styles */
 
 .header {
-  background-color: var(--white);
-  border-bottom: 1px solid var(--border-color);
-  padding: 1rem 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
-  z-index: 100;
-  box-shadow: var(--shadow);
+  z-index: 1000;
 }
 
 .header-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 20px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  align-items: center;
+  height: 70px;
 }
 
-.logo {
+/* Logo Section */
+.logo-section {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+}
+
+.logo-link {
   text-decoration: none;
-  flex-shrink: 0;
+  color: white;
 }
 
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background-color: var(--primary-color);
-  border-radius: 50%;
+.logo-placeholder {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--white);
-  font-weight: 600;
-  font-size: 1.2rem;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.logo-placeholder:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
 }
 
 .logo-text {
-  color: var(--primary-color);
-  font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
 }
 
-.nav {
+.logo-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+/* Navigation */
+.nav-menu {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  flex: 1;
-  justify-content: center;
+  gap: 30px;
 }
 
 .nav-link {
+  color: white;
   text-decoration: none;
-  color: var(--text-dark);
   font-weight: 500;
-  transition: color 0.3s ease;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
 }
 
 .nav-link:hover {
-  color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
 }
 
-.user-section {
+/* User Menu */
+.user-menu {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  background-color: var(--primary-color);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--white);
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  gap: 20px;
 }
 
 .user-name {
-  font-weight: 600;
-  color: var(--text-dark);
-  font-size: 0.9rem;
-}
-
-.user-role {
-  font-size: 0.8rem;
-  color: var(--text-muted);
+  color: white;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
 .logout-btn {
-  background-color: var(--danger-color, #dc3545);
-  color: var(--white);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
-  background-color: var(--danger-dark, #c82333);
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
-.login-btn {
-  background-color: var(--primary-color);
-  color: var(--white);
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
+/* Auth Menu */
+.auth-menu {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-.login-btn:hover {
-  background-color: var(--primary-dark);
+.register-btn {
+  background: white;
+  color: #667eea;
+  font-weight: 600;
 }
 
-/* Responsive design */
+.register-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: #764ba2;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .header-container {
-    padding: 0 1rem;
-    gap: 1rem;
+    padding: 0 15px;
+    height: 60px;
   }
   
-  .nav {
-    gap: 1rem;
+  .nav-menu {
+    gap: 15px;
   }
   
-  .user-details {
-    display: none;
+  .logo-text {
+    font-size: 20px;
+  }
+  
+  .logo-icon {
+    font-size: 24px;
+  }
+  
+  .nav-link {
+    padding: 6px 12px;
+    font-size: 14px;
   }
 }

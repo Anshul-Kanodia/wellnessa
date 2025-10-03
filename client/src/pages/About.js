@@ -9,6 +9,12 @@ const About = () => {
     fetchContent();
   }, []);
 
+  <div className="about-logo">
+  <div className="logo-placeholder">
+    <span className="logo-icon">🏥</span>
+  </div>
+</div>
+
   const fetchContent = async () => {
     try {
       const response = await fetch('/api/content/about');

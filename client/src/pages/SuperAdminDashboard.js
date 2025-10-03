@@ -137,6 +137,32 @@ const SuperAdminDashboard = () => {
       setShowEditContent(true);
     };
 
+    const handleAssignAssessment = async (userId, assessmentId) => {
+      if (!assessmentId) return;
+      
+      try {
+        const response = await fetch('/api/admin/assign-assessment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders()
+          },
+          body: JSON.stringify({
+            userId,
+            assessmentId,
+            dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000) // Due tomorrow
+          })
+        });
+    
+        if (response.ok) {
+          alert('Assessment assigned successfully!');
+          fetchData(); // Refresh data
+        }
+      } catch (error) {
+        console.error('Error assigning assessment:', error);
+      }
+    };  
+
   const handleAddQuestion = async (e) => {
     e.preventDefault();
     try {
@@ -307,6 +333,19 @@ const SuperAdminDashboard = () => {
                     Delete
                   </button>
                 </td>
+                <td>
+  <select 
+    onChange={(e) => handleAssignAssessment(user.id, e.target.value)}
+    defaultValue=""
+  >
+    <option value="">Assign Assessment</option>
+    {assessments.map(assessment => (
+      <option key={assessment.id} value={assessment.id}>
+        {assessment.title}
+      </option>
+    ))}
+  </select>
+</td>
               </tr>
             ))}
           </tbody>
