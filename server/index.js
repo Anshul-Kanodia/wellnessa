@@ -223,11 +223,11 @@ app.post('/api/user/assessments/:id/submit', authenticateToken, async (req, res)
     if (percentage >= 80) {
       feedback = 'Excellent! You\'re maintaining great health habits.';
     } else if (percentage >= 60) {
-      feedback = 'Good progress! Focus on areas where you can improve.';
+      feedback = 'At this stage, we recommend you start doing yoga/meditation. You can follow our tutorials';
     } else if (percentage >= 40) {
-      feedback = 'There\'s room for improvement. Consider consulting with a healthcare professional.';
+      feedback = 'There are signs of loneliness and depression. Try joining support groups or consider consulting with a healthcare professional.';
     } else {
-      feedback = 'We recommend speaking with a healthcare provider about your wellness plan.';
+      feedback = 'We recommend speaking with a professional psychologist about your mental well-being.';
     }
 
     const resultData = {
